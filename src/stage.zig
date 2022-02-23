@@ -36,12 +36,7 @@ pub const Stage = struct {
             .boid_tex = try draw.loadTexture("gfx/ship.png", app.renderer),
         };
 
-        try stage.initializeBoids(arena.allocator());
-
-        for (stage.boids.items) |*boid| {
-            const bounds = boid.getComponent(comp.Bounds).?;
-            std.log.info("{any}", .{ bounds });
-        }
+        try stage.initializeBoids(stage.arena.allocator());
 
         return stage;
     }
