@@ -1,3 +1,5 @@
+const std = @import("std");
+
 pub const Vec2 = struct {
     const Self = @This();
 
@@ -44,5 +46,9 @@ pub const Vec2 = struct {
             .x = self.x / num,
             .y = self.y / num,
         };
+    }
+
+    pub fn magnitude(self: Self) f64 {
+        return @sqrt(std.math.pow(f64, self.x, 2) + std.math.pow(f64, self.y, 2));
     }
 };
