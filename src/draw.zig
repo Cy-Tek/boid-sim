@@ -35,14 +35,7 @@ pub fn blit(bounds: Bounds, tex: *c.SDL_Texture, renderer: *c.SDL_Renderer) void
     _ = c.SDL_RenderCopy(renderer, tex, null, &dest);
 }
 
-pub fn blitRot(bounds: Bounds, tex: *c.SDL_Texture, angle: f64, renderer: *c.SDL_Renderer) void {
-    var dest = c.SDL_Rect{
-        .x = bounds.x,
-        .y = bounds.y,
-        .w = bounds.w,
-        .h = bounds.h,
-    };
-
+pub fn blitRot(dst: c.SDL_Rect, tex: *c.SDL_Texture, angle: f64, renderer: *c.SDL_Renderer) void {
     var src: c.SDL_Rect = c.SDL_Rect{
         .x = 0,
         .y = 0,
@@ -51,5 +44,5 @@ pub fn blitRot(bounds: Bounds, tex: *c.SDL_Texture, angle: f64, renderer: *c.SDL
     };
     _ = c.SDL_QueryTexture(tex, null, null, &src.w, &src.h);
 
-    _ =c.SDL_RenderCopyEx(renderer, tex, &src, &dest, angle, null, c.SDL_FLIP_NONE);
+    _ =c.SDL_RenderCopyEx(renderer, tex, &src, &dst, angle, null, c.SDL_FLIP_NONE);
 }

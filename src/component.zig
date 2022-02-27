@@ -84,23 +84,26 @@ const ErasedComponent = struct {
     }
 };
 
-pub const Velocity = struct {
-    dx: i32 = 0,
-    dy: i32 = 0,
+pub const Boid = struct {
+    vel: Velocity,
+    pos: Position,
+    dim: Dimension,
+    vision: f64,
 };
 
-pub const Bounds = struct {
-    x: i32 = 0,
-    y: i32 = 0,
-    w: i32 = 0,
-    h: i32 = 0,
+pub const Position = struct {
+    x: i32,
+    y: i32,
+};
 
-    pub fn isColliding(self: @This(), other: Bounds) bool {
-        const x_check = @maximum(self.x, other.x) < @minimum(self.x + self.w, other.x + other.w);
-        const y_check = @maximum(self.y, other.y) < @minimum(self.y + self.h, other.y + other.h);
+pub const Dimension = struct {
+    w: i32,
+    h: i32,
+};
 
-        return x_check and y_check;
-    }
+pub const Velocity = struct {
+    dx: i32,
+    dy: i32,
 };
 
 pub const Texture = struct {

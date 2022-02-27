@@ -62,18 +62,17 @@ pub const Stage = struct {
     fn logic(self_ptr: *anyopaque) void {
         var self = utils.castTo(Self, self_ptr);
 
-        for (self.boids.items) |*boid| {
-            const bounds = boid.getComponent(comp.Bounds).?;
-            const velocity = boid.getComponent(comp.Velocity).?;
+        for (self.boids.items) |*entity| {
+            const boid = entity.getComponent(comp.Boid).?;
 
-            bounds.x += velocity.dx;
-            bounds.y += velocity.dy;
+            boid.pos.x += boid.vel.dx;
+            boid.pos.y += boid.vel.dy;
 
-            if (bounds.x + 32 < 0 or bounds.x + 32 > config.ScreenWidth) {
-                velocity.dx = -velocity.dx;
+            if (boid.pos.x < 0 or boid.pos.x + boid.dim.w > config.ScreenWidth) {
+                boid.vel.dx = -boid.vel.dx;
             }
-            if (bounds.y + 32 < 0 or bounds.y + 32 > config.ScreenHeight) {
-                velocity.dy = -velocity.dy;
+            if (boid.pos.y < 0 or boid.pos.y + boid.dim.h > config.ScreenHeight) {
+                boid.vel.dy = -boid.vel.dy;
             }
         }
     }
@@ -82,15 +81,21 @@ pub const Stage = struct {
         var self = utils.castTo(Self, self_ptr);
 
         for (self.boids.items) |*boid| {
-            const bounds = boid.getComponent(comp.Bounds).?;
-            const velocity = boid.getComponent(comp.Velocity).?;
-            const texture = boid.getComponent(comp.Texture).?;
+            const b = boid.getComponent(comp.Boid).?;
+            const t = boid.getComponent(comp.Texture).?;
 
-            const dx = @intToFloat(f64, velocity.dx);
-            const dy = @intToFloat(f64, velocity.dy);
+            const dx = @intToFloat(f64, b.vel.dx);
+            const dy = @intToFloat(f64, b.vel.dy);
 
             const aim = 180 * std.math.atan2(f64, dy, dx) / std.math.pi;
-            draw.blitRot(bounds.*, texture.texture, aim, self.app.renderer);
+            const dst = c.SDL_Rect{
+                .x = b.pos.x,
+                .y = b.pos.y,
+                .w = b.dim.w,
+                .h = b.dim.h,
+            };
+
+            draw.blitRot(dst, t.texture, aim, self.app.renderer);
         }
     }
 
@@ -102,15 +107,21 @@ pub const Stage = struct {
             var boid = Entity.init(allocator);
 
             _ = try boid.addComponent(comp.Texture, .{ .texture = self.boid_tex });
-            _ = try boid.addComponent(comp.Bounds, .{
-                .x = config.ScreenWidth / 2,
-                .y = config.ScreenHeight / 2,
-                .w = 32,
-                .h = 32,
-            });
-            _ = try boid.addComponent(comp.Velocity, .{
-                .dx = random.intRangeAtMost(i32, -10, 10),
-                .dy = random.intRangeAtMost(i32, -10, 10),
+
+            _ = try boid.addComponent(comp.Boid, comp.Boid{
+                .vel = .{
+                    .dx = random.intRangeAtMost(i32, -10, 10),
+                    .dy = random.intRangeAtMost(i32, -10, 10),
+                },
+                .pos = .{
+                    .x = config.ScreenWidth / 2,
+                    .y = config.ScreenHeight / 2,
+                },
+                .dim = .{
+                    .w = 24,
+                    .h = 24,
+                },
+                .vision = 30.0,
             });
 
             try self.boids.append(boid);
