@@ -65,14 +65,14 @@ pub const Stage = struct {
         for (self.boids.items) |*entity| {
             const boid = entity.getComponent(comp.Boid).?;
 
-            boid.pos.x += boid.vel.dx;
-            boid.pos.y += boid.vel.dy;
+            boid.pos.x += boid.vel.x;
+            boid.pos.y += boid.vel.y;
 
-            if (boid.pos.x < 0 or boid.pos.x + boid.dim.w > config.ScreenWidth) {
-                boid.vel.dx = -boid.vel.dx;
+            if (boid.pos.x < 0 or boid.pos.x + @intToFloat(f64, boid.dim.w) > config.ScreenWidth) {
+                boid.vel.x = -boid.vel.x;
             }
-            if (boid.pos.y < 0 or boid.pos.y + boid.dim.h > config.ScreenHeight) {
-                boid.vel.dy = -boid.vel.dy;
+            if (boid.pos.y < 0 or boid.pos.y + @intToFloat(f64, boid.dim.h) > config.ScreenHeight) {
+                boid.vel.y = -boid.vel.y;
             }
         }
     }
@@ -84,13 +84,13 @@ pub const Stage = struct {
             const b = boid.getComponent(comp.Boid).?;
             const t = boid.getComponent(comp.Texture).?;
 
-            const dx = @intToFloat(f64, b.vel.dx);
-            const dy = @intToFloat(f64, b.vel.dy);
+            const x = b.vel.x;
+            const y = b.vel.y;
 
-            const aim = 180 * std.math.atan2(f64, dy, dx) / std.math.pi;
+            const aim = 180 * std.math.atan2(f64, y, x) / std.math.pi;
             const dst = c.SDL_Rect{
-                .x = b.pos.x,
-                .y = b.pos.y,
+                .x = @floatToInt(c_int, b.pos.x),
+                .y = @floatToInt(c_int, b.pos.y),
                 .w = b.dim.w,
                 .h = b.dim.h,
             };
@@ -110,8 +110,8 @@ pub const Stage = struct {
 
             _ = try boid.addComponent(comp.Boid, comp.Boid{
                 .vel = .{
-                    .dx = random.intRangeAtMost(i32, -10, 10),
-                    .dy = random.intRangeAtMost(i32, -10, 10),
+                    .x = random.float(f64) * 20 - 10,
+                    .y = random.float(f64) * 20 - 10
                 },
                 .pos = .{
                     .x = config.ScreenWidth / 2,
@@ -127,4 +127,16 @@ pub const Stage = struct {
             try self.boids.append(boid);
         }
     }
+
+    // fn rule1(self: *Self, boid: *comp.Boid) void {
+    //     var other: comp.Boid = undefined;
+
+    //     for (self.boids.items) |*entity| {
+    //         other = entity.getComponent(comp.Boid).?;
+            
+    //         if (boid != other) {
+    //             boid.vel
+    //         }
+    //     }        
+    // }
 };

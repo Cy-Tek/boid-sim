@@ -8,6 +8,8 @@ const AutoHashMap = std.AutoHashMap;
 const test_alloc = std.testing.allocator;
 const expectEqual = std.testing.expectEqual;
 
+const Vec2 = @import("vector.zig").Vec2;
+
 pub const Manager = struct {
     const Self = @This();
 
@@ -85,25 +87,15 @@ const ErasedComponent = struct {
 };
 
 pub const Boid = struct {
-    vel: Velocity,
-    pos: Position,
+    vel: Vec2,
+    pos: Vec2,
     dim: Dimension,
     vision: f64,
-};
-
-pub const Position = struct {
-    x: i32,
-    y: i32,
 };
 
 pub const Dimension = struct {
     w: i32,
     h: i32,
-};
-
-pub const Velocity = struct {
-    dx: i32,
-    dy: i32,
 };
 
 pub const Texture = struct {
