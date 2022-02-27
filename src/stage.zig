@@ -10,6 +10,7 @@ const comp = @import("component.zig");
 const Entity = @import("./entity.zig").Entity;
 const App = @import("./app.zig").App;
 const Level = @import("level.zig").Level;
+const Vec2 = @import("vector.zig").Vec2;
 
 pub const Stage = struct {
     const Self = @This();
@@ -65,8 +66,7 @@ pub const Stage = struct {
         for (self.boids.items) |*entity| {
             const boid = entity.getComponent(comp.Boid).?;
 
-            boid.pos.x += boid.vel.x;
-            boid.pos.y += boid.vel.y;
+            const vel1 = self.rule1(boid, 0.0005);
 
             if (boid.pos.x < 0 or boid.pos.x + @intToFloat(f64, boid.dim.w) > config.ScreenWidth) {
                 boid.vel.x = -boid.vel.x;
@@ -74,6 +74,11 @@ pub const Stage = struct {
             if (boid.pos.y < 0 or boid.pos.y + @intToFloat(f64, boid.dim.h) > config.ScreenHeight) {
                 boid.vel.y = -boid.vel.y;
             }
+
+            boid.vel = boid.vel.add(vel1);
+
+            boid.pos.x += boid.vel.x;
+            boid.pos.y += boid.vel.y;
         }
     }
 
@@ -128,15 +133,20 @@ pub const Stage = struct {
         }
     }
 
-    // fn rule1(self: *Self, boid: *comp.Boid) void {
-    //     var other: comp.Boid = undefined;
+    fn rule1(self: *Self, boid: *comp.Boid, strength: f64) Vec2 {
+        var other: *comp.Boid = undefined;
+        var center_pos = Vec2{ .x = 0, .y = 0 };
 
-    //     for (self.boids.items) |*entity| {
-    //         other = entity.getComponent(comp.Boid).?;
+        for (self.boids.items) |*entity| {
+            other = entity.getComponent(comp.Boid).?;
             
-    //         if (boid != other) {
-    //             boid.vel
-    //         }
-    //     }        
-    // }
+            if (boid != other) {
+                center_pos = center_pos.add(other.pos); 
+            }
+        }
+
+        center_pos = center_pos.divByConst(@intToFloat(f64, self.boids.items.len) - 1);
+
+        return center_pos.sub(boid.pos).mulByConst(strength);
+    }
 };

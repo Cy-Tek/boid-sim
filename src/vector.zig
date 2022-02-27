@@ -11,6 +11,13 @@ pub const Vec2 = struct {
         };
     }
 
+    pub fn sub(self: Self, other: Vec2) Vec2 {
+        return .{
+            .x = self.x - other.x,
+            .y = self.y - other.y,
+        };
+    }
+
     pub fn mul(self: Self, other: Vec2) Vec2 {
         return .{
             .x = self.x * other.x,
@@ -18,10 +25,24 @@ pub const Vec2 = struct {
         };
     }
 
+    pub fn mulByConst(self: Self, num: f64) Vec2 {
+        return .{
+            .x = self.x * num,
+            .y = self.y * num,
+        };
+    }
+
     pub fn div(self: Self, other: Vec2) Vec2 {
         return .{
             .x = self.x / other.x,
             .y = self.y / other.y,
+        };
+    }
+
+    pub fn divByConst(self: Self, num: f64) Vec2 {
+        return .{
+            .x = self.x / num,
+            .y = self.y / num,
         };
     }
 };
